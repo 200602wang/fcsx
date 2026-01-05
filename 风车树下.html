@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>施工交底协同平台 - 纸面石膏板吊顶模型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            height: 100%;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+            padding: 15px;
+            gap: 15px;
+        }
+        
+        .model-section {
+            flex: 3;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .model-header {
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #model-viewer {
+            flex: 1;
+            border: none;
+            background: #000;
+        }
+        
+        .drawing-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .drawing-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 50%;
+        }
+        
+        .drawing-header {
+            padding: 15px;
+            background: #2ecc71;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .drawing-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+        
+        .drawing-img-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .drawing-img {
+            max-width: 100%;
+            max-height: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .component-list {
+            list-style: none;
+        }
+        
+        .component-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .component-item:hover {
+            background: #e3f2fd;
+            transform: translateX(5px);
+            border-left-color: #2ecc71;
+        }
+        
+        .specification {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .spec-header {
+            padding: 15px;
+            background: #9b59b6;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .spec-content {
+            padding: 20px;
+            line-height: 1.8;
+        }
+        
+        .spec-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+        
+        .spec-label {
+            font-weight: bold;
+            color: #2c3e50;
+            display: inline-block;
+            width: 160px;
+        }
+        
+        .spec-value {
+            color: #555;
+        }
+        
+        .model-controls {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: #2980b9;
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .model-section, .drawing-section {
+                width: 100%;
+                height: 500px;
+            }
+            
+            .drawing-section {
+                flex-direction: row;
+            }
+            
+            .drawing-panel, .specification {
+                flex: 1;
+                height: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .drawing-section {
+                flex-direction: column;
+            }
+            
+            .header-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .model-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>施工交底协同平台 - 模型演示</h1>
+        <p>纸面石膏板吊顶系统 - 轻钢龙骨结构</p>
+        <div class="header-info">
+            <span>上传时间：2025年12月27日</span>
+            <span>模型编号：M-DC-20251227-01</span>
+            <span>工程阶段：施工图交底</span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="model-section">
+            <div class="model-header">
+                <span>三维模型查看器 - 卫生间水电综合管线</span>
+                <span>支持旋转、缩放、平移操作</span>
+            </div>
+            <iframe id="model-viewer" 
+                    src="https://app.modelo.io/embedded/2004867725790769152?viewport=true&autoplay=false&autorotate=false&hideTools=false" 
+                    title="卫生间水电综合管线三维模型" 
+                    allow="autoplay; fullscreen; camera; microphone" 
+                    allowfullscreen
+                    frameborder="0"></iframe>
+            <div class="model-controls">
+                <button class="control-btn" onclick="rotateModel()">自动旋转</button>
+                <button class="control-btn" onclick="resetView()">重置视图</button>
+                <button class="control-btn" onclick="toggleTools()">显示/隐藏工具</button>
+                <button class="control-btn" onclick="enterFullscreen()">全屏查看</button>
+            </div>
+        </div>
+        
+        <div class="drawing-section">
+            <div class="drawing-panel">
+                <div class="drawing-header">轻钢龙骨吊顶构造图纸</div>
+                <div class="drawing-img-container">
+                    <img src="demo-模型.jpg" alt="轻钢龙骨吊顶构造图" class="drawing-img" id="drawing-img">
+                </div>
+            </div>
+            
+            <div class="specification">
+                <div class="spec-header">构造组件与规格说明</div>
+                <div class="spec-content">
+                    <div class="spec-item">
+                        <span class="spec-label">系统类型：</span>
+                        <span class="spec-value">50系列轻钢龙骨吊顶系统</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">主龙骨规格：</span>
+                        <span class="spec-value">50主龙 @ 900mm间距</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">副龙骨规格：</span>
+                        <span class="spec-value">50副龙 @ 300×600mm系列</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">石膏板配置：</span>
+                        <span class="spec-value">单层9.5mm石膏板（常规区域） + 双层9.5mm石膏板（特殊区域）</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">吊挂系统：</span>
+                        <span class="spec-value">M8膨胀螺栓固定 + 8mm丝杆 + 吊件(60)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">连接件：</span>
+                        <span class="spec-value">M6螺栓 + 螺母 + 垫圈</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">表面处理：</span>
+                        <span class="spec-value">满批腻子三度 + 乳胶漆三度</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">特殊构造：</span>
+                        <span class="spec-value">暗藏灯带设计</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟组件高亮功能
+        function highlightComponent(componentName) {
+            const items = document.querySelectorAll('.component-item');
+            items.forEach(item => item.style.background = '#f8f9fa');
+            
+            event.currentTarget.style.background = '#e3f2fd';
+            alert('高亮显示组件: ' + componentName + '\n（实际应用中此处会联动高亮3D模型中的对应构件）');
+        }
+        
+        // 模型控制函数
+        function rotateModel() {
+            alert('切换自动旋转模式\n（实际应用中此处会控制3D模型旋转）');
+        }
+        
+        function resetView() {
+            alert('重置模型视图到初始位置\n（实际应用中此处会重置3D模型视角）');
+        }
+        
+        function toggleTools() {
+            alert('切换工具栏显示/隐藏\n（实际应用中此处会控制3D查看器工具栏）');
+        }
+        
+        function enterFullscreen() {
+            const iframe = document.getElementById('model-viewer');
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) {
+                iframe.msRequestFullscreen();
+            }
+        }
+        
+        // 图纸点击放大功能
+        document.getElementById('drawing-img').addEventListener('click', function() {
+            this.classList.toggle('enlarged');
+            if (this.classList.contains('enlarged')) {
+                this.style.maxWidth = 'none';
+                this.style.maxHeight = 'none';
+                this.style.cursor = 'zoom-out';
+            } else {
+                this.style.maxWidth = '100%';
+                this.style.maxHeight = '100%';
+                this.style.cursor = 'zoom-in';
+            }
+        });
+        
+        // 添加键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'f' || e.key === 'F') {
+                enterFullscreen();
+            } else if (e.key === 'r' || e.key === 'R') {
+                resetView();
+            }
+        });
+        
+        // 页面加载完成提示
+        window.addEventListener('load', function() {
+            console.log('施工交底协同平台已加载完成');
+            console.log('快捷键: F - 全屏, R - 重置视图');
+        });
+    </script>
+</body>
+</html>
